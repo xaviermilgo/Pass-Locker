@@ -65,22 +65,26 @@ class User:
 	def interactive(self):
 		pass
 
-
 class Program:
 	users={}
+	use_gui=False
 	def __init__(self,configfile='progdata'):
-		self.parse(configfile)
+		self.configfile=configfile
+		self.parse()
 		print(self.users)
+	def begin(self):
 		try:
 			self.interactive()
 		except KeyboardInterrupt:
 			pass
 		print("Saving configuration ...")
-		self.export(configfile)
+		self.export()
+	def tkintergui(self):
+		import tkinter
 	def interactive(self):
 		pass
-	def parse(self,configfile):
-		with open(configfile) as conf:
+	def parse(self):
+		with open(self.configfile) as conf:
 			data=conf.read().split('\n\n')
 		for user in data:
 			userdata={}
@@ -88,8 +92,8 @@ class Program:
 			userdata['passhash']=user.split('\n\t')[0].split(':')[1]
 			userdata['encrypts']=user.split('\n\t')[1:]
 			self.users[username]=User(username,userdata)
-	def export(self,configfile):
-		with open(configfile,'w') as wr: 
+	def export(self):
+		with open(self.configfile,'w') as wr: 
 			usersdata=[obj.export() for obj in self.users.values()]
 			wr.write('\n\n'.join([data for data in usersdata]))
 passwlocker=Program()
