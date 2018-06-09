@@ -1,3 +1,6 @@
+from user import User
+from hashlib import sha512
+
 class Program:
 	users={}
 	def __init__(self,configfile='progdata',use_gui=False):
@@ -6,7 +9,7 @@ class Program:
 		self.parse()
 	def begin(self):
 		try:
-			self.interactive()
+			self.tkintergui() if self.use_gui else self.interactive()
 		except KeyboardInterrupt:
 			pass
 		print("Saving configuration ...")
@@ -14,14 +17,25 @@ class Program:
 	def tkintergui(self):
 		import tkinter
 	def interactive(self):
-		pass
+		while True:
+			try:
+				choice=input("""Select an option:
+	1.Login
+	2.Create new User
+	3.Exit\n""")
+				if choice=='1': self.users[input("Name:")].interactive()
+				elif choice=='2': self.adduser(input("username:"),input("password:"))
+				else: raise KeyboardInterrupt
+			except KeyboardInterrupt:
+				break
 	def adduser(self,name,password):
-		password=sha512(password).hexdigest()
+		password=sha512(password.encode('utf-8')).hexdigest()
 		userdata={
 			'passhash':password,
 			'encrypts':[]
 		}
 		if name in self.users.keys():
+			print("A user already exists with that username!")
 			return False
 		self.users[name]=User(name,userdata)
 	def parse(self):

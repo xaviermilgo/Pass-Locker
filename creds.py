@@ -1,3 +1,8 @@
+from hashlib import pbkdf2_hmac
+from cryptography.fernet import Fernet
+from base64 import urlsafe_b64encode,urlsafe_b64decode
+from os import urandom
+
 class Credential:
 	def __init__(self,plaintext='',username='',userpass='',encrypted='',salt=''):
 		self.__password=plaintext
@@ -13,6 +18,12 @@ class Credential:
 	def decrypt(self):
 		fnet=Fernet(self.enckey)
 		uname,upass=fnet.decrypt(self.encrypted).split(b':::')
-		return b':'.join([uname,upass]).decode('utf-8')
+		return b'\t'.join([uname,upass]).decode('utf-8')
+	def shiftkey(self,newpass):
+		old=Fernet(self.enckey)
+		ekey=pbkdf2_hmac('sha256',newpass,self.salt, 100000)
+		self.enckey=urlsafe_b64encode(ekey)
+		new=Fernet(self.enckey)
+		self.encrypted=new.encrypt(old.decrypt(self.encrypted))
 	def export(self):
 		return self.encrypted.decode('utf-8')+':'+urlsafe_b64encode(self.salt).decode('utf-8')

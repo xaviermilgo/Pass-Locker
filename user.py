@@ -1,3 +1,6 @@
+from hashlib import sha512
+from creds import Credential
+
 class User:
 	decrypted=False
 	def __init__(self,username,userdata):
@@ -17,9 +20,12 @@ class User:
 	def decrypt(self):
 		self.decrypted=True
 		for encr in self.encrypts:
-			encname,encpass,encsalt=encr.split(':')
-			tmp=Credential(userpass=self.password,encrypted=encpass,salt=encsalt)
-			self.logins[encname]=tmp
+			try:
+				encname,encpass,encsalt=encr.split(':')
+				tmp=Credential(userpass=self.password,encrypted=encpass,salt=encsalt)
+				self.logins[encname]=tmp
+			except:
+				pass
 	def add_password(self):
 		encname=input("Login:")
 		uname=input("Username:")
@@ -34,10 +40,34 @@ class User:
 				yield '\n\t'+name+':'+cred.export()
 		else:
 			yield '\n\t'+'\n\t'.join(self.encrypts)
+	def updatemaster(self):
+		self.password=input("Type current password:").encode('utf-8')
+		if self.verifyhash():
+			self.password=input("Type new password:").encode('utf-8')
+			self.loginhash=sha512(self.password).hexdigest()
+			#We also have to reencrypt our passwords
+			map(lambda x:x.shiftkey(self.password),self.logins.values())
+			print(self.logins)
+			print("Password updated successfully")
+		else:
+			print("Wrong password!")
+			raise KeyboardInterrupt
 	def show(self):
-		print(f'{self.name}:{self.password}')
 		for name,cred in self.logins.items():
-			print('\n\t'+name+':'+cred.decrypt())
-		print(self.logins)
+			print('\n\t'+name+'\t'+cred.decrypt())
 	def interactive(self):
-		pass
+		self.login()
+		while True:
+			try:
+				choice=input("""Select an option:
+	1.Add Login credential
+	2.Show saved credentials
+	3.Update Master key
+	4.Logout\n""")
+				if choice=='1': self.add_password()
+				elif choice=='2': self.show()
+				elif choice=='3': self.updatemaster() 
+				elif choice=='4': return
+			except KeyboardInterrupt:
+				print("You have been logged out!")
+				break
