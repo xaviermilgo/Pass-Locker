@@ -94,6 +94,6 @@ class Program:
 			self.users[username]=User(username,userdata)
 	def export(self):
 		with open(self.configfile,'w') as wr: 
-			usersdata=[obj.export() for obj in self.users.values()]
-			wr.write('\n\n'.join([data for data in usersdata]))
+			usersdata=[''.join(obj.export()) for obj in self.users.values()]
+			wr.write('\n\n'.join(usersdata))
 passwlocker=Program()
