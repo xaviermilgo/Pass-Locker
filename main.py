@@ -7,7 +7,7 @@ class Credential:
 		self.__password=plaintext
 		self.key=userpass
 		self.username=username
-		self.encrypted=encrypted
+		self.encrypted=bytes(encrypted,'utf-8')
 		self.salt=urandom(16) if salt=='' else urlsafe_b64decode(salt)
 		ekey=pbkdf2_hmac('sha256',self.key,self.salt, 100000)
 		self.enckey=urlsafe_b64encode(ekey)
@@ -16,8 +16,8 @@ class Credential:
 		self.encrypted=fernet.encrypt(bytes(self.username+':::'+self.__password,'utf-8'))
 	def decrypt(self):
 		fnet=Fernet(self.enckey)
-		uname,upass=fnet.decrypt(self.encrypted).split(':::')
-		return {uname:upass}
+		uname,upass=fnet.decrypt(self.encrypted).split(b':::')
+		return b':'.join([uname,upass]).decode('utf-8')
 	def export(self):
 		return self.encrypted.decode('utf-8')+':'+urlsafe_b64encode(self.salt).decode('utf-8')
 
@@ -35,13 +35,15 @@ class User:
 			print('Wrong password!')
 			self.login()
 		else:
+			self.decrypt()
+			self.show()
 			self.add_password()
 			self.show()
 	def decrypt(self):
-		for encr in encrypts:
+		for encr in self.encrypts:
 			encname,encpass,encsalt=encr.split(':')
 			tmp=Credential(userpass=self.password,encrypted=encpass,salt=encsalt)
-			self.logins[encname]=tmp.decrypt()
+			self.logins[encname]=tmp
 	def add_password(self):
 		encname=input("Login:")
 		uname=input("Username:")
@@ -52,8 +54,11 @@ class User:
 	def export(self):
 		yield self.name+':'+self.loginhash
 		for name,cred in self.logins.items():
-			yield '\n\t'+name':'+cred.export()
+			yield '\n\t'+name+':'+cred.export()
 	def show(self):
+		print(f'{self.name}:{self.password}')
+		for name,cred in self.logins.items():
+			print('\n\t'+name+':'+cred.decrypt())
 		print(self.logins)
 
 
