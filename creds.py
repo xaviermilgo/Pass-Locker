@@ -18,7 +18,7 @@ class Credential:
 	def decrypt(self):
 		fnet=Fernet(self.enckey)
 		uname,upass=fnet.decrypt(self.encrypted).split(b':::')
-		return b'\t'.join([uname,upass]).decode('utf-8')
+		return [uname.decode('utf-8'),upass.decode('utf-8')]
 	def shiftkey(self,newpass):
 		old=Fernet(self.enckey)
 		ekey=pbkdf2_hmac('sha256',newpass,self.salt, 100000)
