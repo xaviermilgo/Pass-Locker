@@ -15,7 +15,7 @@ class Program:
 		print("Saving configuration ...")
 		self.export()
 	def tkintergui(self):
-		import tkinter
+		pass
 	def interactive(self):
 		while True:
 			try:
