@@ -22,6 +22,7 @@ class Credential:
 		return self.encrypted.decode('utf-8')+':'+urlsafe_b64encode(self.salt).decode('utf-8')
 
 class User:
+	decrypted=False
 	def __init__(self,username,userdata):
 		self.name=username
 		self.loginhash=userdata['passhash']
@@ -36,10 +37,8 @@ class User:
 			self.login()
 		else:
 			self.decrypt()
-			self.show()
-			self.add_password()
-			self.show()
 	def decrypt(self):
+		self.decrypted=True
 		for encr in self.encrypts:
 			encname,encpass,encsalt=encr.split(':')
 			tmp=Credential(userpass=self.password,encrypted=encpass,salt=encsalt)
@@ -53,13 +52,18 @@ class User:
 		self.logins[encname]=tmp
 	def export(self):
 		yield self.name+':'+self.loginhash
-		for name,cred in self.logins.items():
-			yield '\n\t'+name+':'+cred.export()
+		if self.decrypted:
+			for name,cred in self.logins.items():
+				yield '\n\t'+name+':'+cred.export()
+		else:
+			yield '\n\t'+'\n\t'.join(self.encrypts)
 	def show(self):
 		print(f'{self.name}:{self.password}')
 		for name,cred in self.logins.items():
 			print('\n\t'+name+':'+cred.decrypt())
 		print(self.logins)
+	def interactive(self):
+		pass
 
 
 class Program:
@@ -67,8 +71,14 @@ class Program:
 	def __init__(self,configfile='progdata'):
 		self.parse(configfile)
 		print(self.users)
-		self.users['Xavier'].login()
+		try:
+			self.interactive()
+		except KeyboardInterrupt:
+			pass
+		print("Saving configuration ...")
 		self.export(configfile)
+	def interactive(self):
+		pass
 	def parse(self,configfile):
 		with open(configfile) as conf:
 			data=conf.read().split('\n\n')
@@ -80,6 +90,6 @@ class Program:
 			self.users[username]=User(username,userdata)
 	def export(self,configfile):
 		with open(configfile,'w') as wr: 
-			for name,userobject in self.users.items():
-				wr.write(''.join(userobject.export()))
+			usersdata=[obj.export() for obj in self.users.values()]
+			wr.write('\n\n'.join([data for data in usersdata]))
 passwlocker=Program()
