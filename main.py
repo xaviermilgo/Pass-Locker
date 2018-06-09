@@ -83,6 +83,15 @@ class Program:
 		import tkinter
 	def interactive(self):
 		pass
+	def adduser(self,name,password):
+		password=sha512(password).hexdigest()
+		userdata={
+			'passhash':password,
+			'encrypts':[]
+		}
+		if name in self.users.keys():
+			return False
+		self.users[name]=User(name,userdata)
 	def parse(self):
 		with open(self.configfile) as conf:
 			data=conf.read().split('\n\n')
