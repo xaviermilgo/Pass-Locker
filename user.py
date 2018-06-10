@@ -21,6 +21,7 @@ class User:
 	def decrypt(self):
 		self.decrypted=True
 		for encr in self.encrypts:
+			if encr=='': continue
 			encname,encpass,encsalt=encr.split(':')
 			tmp=Credential(userpass=bytes(self.password,'utf-8'),encrypted=encpass,salt=encsalt)
 			self.logins[encname]=tmp
@@ -28,7 +29,7 @@ class User:
 		if encname in self.logins.keys():
 			print("Choose another Name")
 			return False
-		tmp=Credential(username=uname,plaintext=passw,userpass=self.password)
+		tmp=Credential(username=uname,plaintext=passw,userpass=bytes(self.password,'utf-8'))
 		tmp.encrypt()
 		self.logins[encname]=tmp
 		return True
@@ -40,11 +41,12 @@ class User:
 		else:
 			yield '\n\t'+'\n\t'.join(self.encrypts)
 	def updatemaster(self,current,newpass):
-		self.password=current.encode('utf-8')
+		self.password=current
 		if self.verifyhash():
 			self.password=newpass.encode('utf-8')
 			self.loginhash=sha512(self.password).hexdigest()
-			map(lambda x:x.shiftkey(self.password),self.logins.values())
+			for cred in self.logins.values():
+				cred.shiftkey(self.password)
 			print("Password updated successfully")
 			return True
 		else:

@@ -24,5 +24,6 @@ class Credential:
 		self.enckey=urlsafe_b64encode(ekey)
 		new=Fernet(self.enckey)
 		self.encrypted=new.encrypt(old.decrypt(self.encrypted))
+		print("changed")
 	def export(self):
 		return self.encrypted.decode('utf-8')+':'+urlsafe_b64encode(self.salt).decode('utf-8')
