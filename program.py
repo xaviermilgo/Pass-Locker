@@ -6,14 +6,6 @@ class Program:
 	def __init__(self,configfile='progdata'):
 		self.configfile=configfile
 		self.parse()
-	def begin(self):
-		try:
-			self.interactive()
-		except KeyboardInterrupt:
-			pass
-		self.export()
-	def interactive(self):
-		##Refactor planned
 	def adduser(self,name,password):
 		password=sha512(password.encode('utf-8')).hexdigest()
 		userdata={
@@ -38,3 +30,4 @@ class Program:
 		with open(self.configfile,'w') as wr: 
 			usersdata=[''.join(obj.export()) for obj in self.users.values()]
 			wr.write('\n\n'.join(usersdata))
+		exit(0)

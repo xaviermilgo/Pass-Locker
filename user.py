@@ -9,8 +9,8 @@ class User:
 		self.encrypts=userdata['encrypts']
 		self.logins={}
 	def verifyhash(self):
-		return sha512(self.password).hexdigest()==self.loginhash
-	def login(self,password=False):
+		return sha512(self.password.encode('utf-8')).hexdigest()==self.loginhash
+	def login(self,password=''):
 		self.password=password
 		if not self.verifyhash():
 			print('Wrong password!')
@@ -21,13 +21,9 @@ class User:
 	def decrypt(self):
 		self.decrypted=True
 		for encr in self.encrypts:
-			# noinspection PyBroadException
-			try:
-				encname,encpass,encsalt=encr.split(':')
-				tmp=Credential(userpass=self.password,encrypted=encpass,salt=encsalt)
-				self.logins[encname]=tmp
-			except:
-				pass
+			encname,encpass,encsalt=encr.split(':')
+			tmp=Credential(userpass=bytes(self.password,'utf-8'),encrypted=encpass,salt=encsalt)
+			self.logins[encname]=tmp
 	def add_password(self,encname,uname,passw):
 		if encname in self.logins.keys():
 			print("Choose another Name")
@@ -56,6 +52,5 @@ class User:
 			return False
 	def show(self):
 		for name,cred in self.logins.items():
-			return [name]+cred.decrypt()
-	def interactive(self):
-		#Refactor planned
+			creds=cred.decrypt()
+			yield [name]+creds
