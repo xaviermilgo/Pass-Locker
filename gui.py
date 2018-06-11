@@ -24,6 +24,11 @@ class WelcomeFrame(Frame):
 		self.userbutton.grid(row=2,column=1,pady=10,padx=10)
 		self.screen.pack(fill=BOTH,expand=1)
 	def login(self):
+		if len(passwlocker.users)<1:
+			message="There are no users registered.Please register first"
+			messagebox.showerror("Error",message)
+			self.adduser()
+			return
 		self.screen.destroy()
 		self.screen=Frame()
 		banner=Label(self.screen,text="Type Your Master pasword below")

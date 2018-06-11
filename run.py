@@ -10,7 +10,7 @@ def showcreds(username):
 	credentials=[pair for pair in userobject.show(show='')]
 	# While true pia hapa
 	columns=['', 'Username','Password']
-	lines=(len(credentials)*3+2)
+	lines=(len(credentials)*3+3)
 	print_s(tabulate(credentials,columns,'grid'))
 	while True:
 		print("Type:")
@@ -28,7 +28,7 @@ def showcreds(username):
 			name=choice.split(" ")[1]
 			text=userobject.logins[name].copy()
 			print_s(f"{name} has been copied to clipboard")
-			lines=0
+			lines=1
 			sleep(1)
 			clearterm(0)
 		elif choice=='quit':
@@ -40,7 +40,7 @@ def addcred(username):
 	if name in userobject.logins.keys():
 		print_e(f"Entry {name} already exists")
 		sleep(1)
-		clearterm(1)
+		clearterm(0)
 		return
 	user=input("Username:")
 	passw=input("Password:")

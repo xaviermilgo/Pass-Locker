@@ -21,6 +21,7 @@ class Program:
 		with open(self.configfile) as conf:
 			data=conf.read().split('\n\n')
 		for user in data:
+			if user=='': continue
 			userdata={}
 			username=user.split('\n\t')[0].split(':')[0]
 			userdata['passhash']=user.split('\n\t')[0].split(':')[1]
