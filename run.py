@@ -105,14 +105,16 @@ def create():
 	name=input("Username:")
 	if name in passwlocker.users.keys():
 		print_e("Username already exists")
+		sleep(1)
+		clearterm(1)
 		return
 	passw=getpass("Password:")
 	success=passwlocker.adduser(name,passw)
+	clearterm(1)
 	if success:
-		print_s("Password updated successfully")
-	else:
-		print_e("Wrong initial password!")
-	raise KeyboardInterrupt
+		print_s(f"User {name} added successfully")
+		sleep(1)
+		clearterm(0)
 try:
 	banner()
 	while True:
