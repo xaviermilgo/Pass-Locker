@@ -132,8 +132,10 @@ class WelcomeFrame(Frame):
 		add.grid(column=0,row=2,padx=25,pady=10)
 		change=Button(self.screen, text="Change Master pass", command=self.changekey)
 		change.grid(column=0,row=3,padx=25,pady=10)
+		logout=Button(self.screen, text="Log out",command=self.default)
+		logout.grid(row=4,column=0,pady=40)
 		exit=Button(self.screen, text="Exit",command=passwlocker.export)
-		exit.grid(row=4,column=0,pady=40)
+		exit.grid(row=5,column=0)
 		self.screen.pack(fill=BOTH,expand=1)
 	#Interactive methods -->
 	def dochange(self):

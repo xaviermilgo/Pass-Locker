@@ -13,7 +13,6 @@ class User:
 	def login(self,password=''):
 		self.password=password
 		if not self.verifyhash():
-			print('Wrong password!')
 			return False
 		else:
 			self.decrypt()
@@ -27,7 +26,6 @@ class User:
 			self.logins[encname]=tmp
 	def add_password(self,encname,uname,passw):
 		if encname in self.logins.keys():
-			print("Choose another Name")
 			return False
 		tmp=Credential(username=uname,plaintext=passw,userpass=bytes(self.password,'utf-8'))
 		tmp.encrypt()
@@ -47,12 +45,15 @@ class User:
 			self.loginhash=sha512(self.password).hexdigest()
 			for cred in self.logins.values():
 				cred.shiftkey(self.password)
-			print("Password updated successfully")
 			return True
 		else:
-			print("Wrong password!")
 			return False
-	def show(self):
-		for name,cred in self.logins.items():
-			creds=cred.decrypt()
-			yield [name]+creds
+	def show(self,show=False):
+		if show!=False:
+			for name,cred in self.logins.items():
+				creds=cred.decrypt(hide=show!=name)
+				yield [name]+creds
+		else:
+			for name,cred in self.logins.items():
+				creds=cred.decrypt()
+				yield [name]+creds
