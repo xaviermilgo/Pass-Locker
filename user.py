@@ -9,7 +9,8 @@ class User:
 		self.encrypts=userdata['encrypts']
 		self.logins={}
 	def verifyhash(self):
-		return sha512(self.password.encode('utf-8')).hexdigest()==self.loginhash
+		hash=sha512((self.password).encode('utf-8'))
+		return hash.hexdigest()==self.loginhash
 	def login(self,password=''):
 		self.password=password
 		if not self.verifyhash():
@@ -17,6 +18,9 @@ class User:
 		else:
 			self.decrypt()
 			return True
+		if encname in self.logins.keys():
+			return False
+		tmp=Credential(username=uname,plaintext=passw,userpass=bytes(self.password,'utf-8'))
 	def decrypt(self):
 		self.decrypted=True
 		for encr in self.encrypts:
@@ -25,9 +29,6 @@ class User:
 			tmp=Credential(userpass=bytes(self.password,'utf-8'),encrypted=encpass,salt=encsalt)
 			self.logins[encname]=tmp
 	def add_password(self,encname,uname,passw):
-		if encname in self.logins.keys():
-			return False
-		tmp=Credential(username=uname,plaintext=passw,userpass=bytes(self.password,'utf-8'))
 		tmp.encrypt()
 		self.logins[encname]=tmp
 		return True
