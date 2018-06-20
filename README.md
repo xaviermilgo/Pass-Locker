@@ -51,9 +51,11 @@ As shown in the image:
 
 ## Security
 
-The user logs in to the system using apassword. This password is hashed using sha512 stored in the progdata file.
+The user logs in to the system using a password. This password is hashed using sha512 stored in the progdata file.
 
 The credentials of users are stored within the progdata file but they are encrypted using fernet encryption. The key used in this encryptin is the users master key.
+
+The password is not salted as I have not had enought time to implement that function.
 
 #### Note: This is an academic project. Although it implements security measures such as encryprtion it should not be used as a reliable project. It may have simple bugs that may lead to bigger problems. If you think you have found any bug please inform me.
 
