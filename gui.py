@@ -2,7 +2,8 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter.ttk import *
 from program import Program
-import pyperclip
+from base64 import b64encode
+from os import urandom
 root = Tk()
 passwlocker=Program()
 
@@ -59,8 +60,8 @@ class WelcomeFrame(Frame):
 		adduser.pack()
 		self.screen.pack(fill=BOTH,expand=1)
 	def toclip(self,cred):
-		print(cred)
-		pyperclip.copy(cred[2])
+		root.clipboard_clear()
+		root.clipboard_append(cred)
 	def showpass(self):
 		self.screen.destroy()
 		self.screen=Frame(width=12)
@@ -90,6 +91,12 @@ class WelcomeFrame(Frame):
 		exit=Button(self.screen, text="Exit",command=passwlocker.export)
 		exit.grid(row=index,column=2)
 		self.screen.pack(fill=BOTH,expand=1)
+	def genrand(self,limit=9):
+		if type(limit).__name__!='int':
+			return
+		rnd=b64encode(urandom(320))[:limit]
+		self.passentry.delete(0,END)
+		self.passentry.insert(0,rnd)
 	def addcreds(self):
 		self.screen.destroy()
 		self.screen=Frame()
@@ -97,7 +104,9 @@ class WelcomeFrame(Frame):
 		Label(self.screen, text="User: ").grid(row=1,column=0,pady=15)
 		Label(self.screen, text="Pass: ").grid(row=2,column=0,pady=15)
 		saver=Button(self.screen, text="Save Cred",command=self.savecred)
-		saver.grid(row=3,column=1,padx=30,pady=20)
+		gen=Button(self.screen, text="Generate pass",command=self.genrand)
+		gen.grid(row=3,column=1)
+		saver.grid(row=4,column=1,padx=30,pady=20)
 		self.unameentry=Entry(self.screen)
 		self.userentry=Entry(self.screen)
 		self.passentry=Entry(self.screen,show="*")
@@ -105,9 +114,9 @@ class WelcomeFrame(Frame):
 		self.userentry.grid(row=1,column=1)
 		self.passentry.grid(row=2,column=1)
 		home=Button(self.screen, text="Home",command=self.successlogin)
-		home.grid(row=4,column=0,padx=20,pady=30)
+		home.grid(row=5,column=0,padx=20,pady=30)
 		logout=Button(self.screen, text="Log out",command=self.default)
-		logout.grid(row=4,column=1)
+		logout.grid(row=5,column=1)
 		self.screen.pack(fill=BOTH,expand=1)
 	def changekey(self):
 		self.screen.destroy()

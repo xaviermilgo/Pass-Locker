@@ -2,6 +2,8 @@ from program import Program
 from prints import *
 from getpass import getpass
 from time import sleep
+from os import urandom
+from base64 import b64encode
 passwlocker=Program()
 import sys
 #This is the in Terminal version of the program use gui.py for graphical version
@@ -43,7 +45,11 @@ def addcred(username):
 		clearterm(0)
 		return
 	user=input("Username:")
-	passw=input("Password:")
+	if input("Generate password? [Y/n]")=='n':
+		passw=input("Password:")
+		clearterm(0)
+	else:
+		passw=b64encode(urandom(350))[:8].decode('utf-8')
 	success=userobject.add_password(name,user,passw)
 	if success:
 		clearterm(2)
