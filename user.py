@@ -29,6 +29,9 @@ class User:
 			tmp=Credential(userpass=bytes(self.password,'utf-8'),encrypted=encpass,salt=encsalt)
 			self.logins[encname]=tmp
 	def add_password(self,encname,uname,passw):
+		if encname in self.logins.keys():
+			return False
+		tmp=Credential(username=uname,plaintext=passw,userpass=bytes(self.password,'utf-8'))
 		tmp.encrypt()
 		self.logins[encname]=tmp
 		return True
